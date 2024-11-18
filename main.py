@@ -44,7 +44,8 @@ class GrabCollide(QGraphicsEllipseItem):
         # self.setFlag(QGraphicsItem.ItemIsMovable)
 
     def hoverEnterEvent(self, event):
-        app.instance().setOverrideCursor(Qt.OpenHandCursor)
+        # app.instance().setOverrideCursor(Qt.OpenHandCursor)
+        pass
 
     def hoverLeaveEvent(self, event):
         app.instance().restoreOverrideCursor()
@@ -60,10 +61,17 @@ class GrabCollide(QGraphicsEllipseItem):
         updated_cursorX = updated_position.x() - orig_position.x() + original.x()
         updated_cursorY = updated_position.y() - orig_position.y() + original.y()
         self.setPos(QPointF(updated_cursorX, updated_cursorY))
-        
         if len(self.collidingItems()) != 0:
-            self.scene.removeItem(self.collidingItems()[0])
-            self.setBrush(Qt.blue)
+            self.setBrush(Qt.black)
+        else:
+            self.setBrush(Qt.red)
+
+
+    def mouseReleaseEvent(self, event):
+        if len(self.collidingItems()) != 0:
+            self.collidingItems()[0].setBrush(Qt.blue)
+            self.scene.removeItem(self)
+           
 
 
 class DrawSpace(QGraphicsView):
