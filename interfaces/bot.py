@@ -33,3 +33,23 @@ class Bottom(QFrame):
         self.scrollarea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.layout.addWidget(self.scrollarea)
 
+        self.history = QFrame(self)
+        self.history.setObjectName('history')
+        self.history.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.history.setMinimumSize(550,0)
+        self.history.setStyleSheet("""QFrame#history{background: rgb(255,255,255);
+                                    border-style:solid;
+                                    border-width: 2px;}""")
+
+        self.layout.addWidget(self.history)
+
+        self.output_matr = QFrame(self)
+        self.output_matr.setObjectName('outMatrix')
+        self.output_matr.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.output_matr.setMinimumSize(250,0)
+        self.output_matr.setStyleSheet("""QFrame#outMatrix{background: rgb(255,255,255);
+                                    border-style:solid;
+                                    border-width: 2px;}""")
+
+        self.layout.addWidget(self.output_matr)
+
