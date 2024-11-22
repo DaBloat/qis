@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from utils.layouts import *
+from utils.widgets import *
 
 class Top(QFrame):
     def __init__(self, placeholder):
@@ -15,71 +17,36 @@ class Top(QFrame):
 
         self.layout = QHBoxLayout(self)
 
-        self.title = QFrame(self)
-        self.title.setObjectName('title')
-        self.title.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        self.title.setMinimumSize(150,0)
-        self.title.setStyleSheet("""QFrame#title{background: rgb(255,255,255);
-                                    border-style:solid;
-                                    border-width: 2px;}""")
-        self.title_layout = QVBoxLayout(self.title)
-        self.text = QLabel("QIS")
-        self.text.setAlignment(Qt.AlignCenter)
-        self.text.setStyleSheet('font: 87 48pt "Arial Black";')
-        self.text2 = QLabel("Quantum Interactive Space")
-        self.text2.setStyleSheet('font-size: 7.5pt')
-        self.text2.setAlignment(Qt.AlignCenter)
-        self.title_layout.addWidget(self.text)
-        self.title_layout.addWidget(self.text2)
-        self.layout.addWidget(self.title)
+        self.title = TitleCard(self, 'QIS', 'Quantum Interactive Space')
 
-        self.horizontalSpacer = QSpacerItem(50, 0, QSizePolicy.Fixed)
-        self.layout.addItem(self.horizontalSpacer)
-        self.vertlayout = QVBoxLayout(self)
-        self.layout.addLayout(self.vertlayout)
-         
-        self.flayerbutton = QHBoxLayout(self)
-        self.vertlayout.addLayout(self.flayerbutton)
-
-        self.slayerbutton = QHBoxLayout(self)
-        self.vertlayout.addLayout(self.slayerbutton)
-
-        self.button1 = QPushButton('Sample 1')
-        self.flayerbutton.addWidget(self.button1)
-        self.button2 = QPushButton('Sample 2')
-        self.flayerbutton.addWidget(self.button2)
-        self.button3 = QPushButton('Sample 3')
-        self.flayerbutton.addWidget(self.button3)
-        self.button4 = QPushButton('Sample 4')
-        self.flayerbutton.addWidget(self.button4)
+        self.horSpacer = Spacers(50,0)
         
-        self.button5 = QPushButton('Sample 5')
-        self.flayerbutton.addWidget(self.button5)
-        self.button6 = QPushButton('Sample 6')
-        self.slayerbutton.addWidget(self.button6)
-        self.button7 = QPushButton('Sample 7')
-        self.slayerbutton.addWidget(self.button7)
-        self.button8 = QPushButton('Sample 8')
-        self.slayerbutton.addWidget(self.button8)
+        self.button1 = Button(self, 'New')
+        self.button2 = Button(self, 'Open')
+        self.button3 = Button(self, 'Save')
+        self.button4 = Button(self, 'Undo')
+        self.button5 = Button(self, 'Redo')
+        self.button6 = Button(self, 'Select')
+        self.button7 = Button(self, 'Delete')
+        self.button8 = Button(self, 'Add Notes')
+        self.button9 = Button(self, 'Draw Arrow')
 
+        self.howtobutton = Button(self, '?')
+        self.documentation = Button(self, 'documentation')
+        self.github = Button(self, 'Github')
+        self.email = Button(self, 'Email')
 
-        self.horizontalSpacer2 = QSpacerItem(50, 0, QSizePolicy.Fixed)
-        self.layout.addItem(self.horizontalSpacer2)
-        self.vertlayout2 = QVBoxLayout(self)
-        self.layout.addLayout(self.vertlayout2)
-         
-        self.howtolayerbutton = QHBoxLayout(self)
-        self.vertlayout2.addLayout(self. howtolayerbutton)
-
-        self.reachlayerbutton = QHBoxLayout(self)
-        self.vertlayout2.addLayout(self.reachlayerbutton)
-        self.buttontry = QPushButton('?')
-        self.howtolayerbutton.addWidget(self.buttontry)
-        self.documentation = QPushButton('documentation')
-        self.howtolayerbutton.addWidget(self.documentation)
-
-        self.email = QPushButton('email')
-        self.reachlayerbutton.addWidget(self.email)
-        self.github = QPushButton('github')
-        self.reachlayerbutton.addWidget(self.github)
-
+            
+        self.grid_buttons1 = StackOrganizer(self)
+        self.grid_buttons1.stack(top=[self.button1, self.button2, self.button3, self.button4, self.button5],
+                                 bottom=[self.button6, self.button7, self.button8, self.button9])
+        self.grid_buttons2 = StackOrganizer(self)
+        self.grid_buttons2.stack(top=[self.howtobutton,self.documentation], bottom=[self.github, self.email])
+        self.layout.addWidget(self.title)
+        self.layout.addItem(self.horSpacer)
+        self.layout.addItem(self.grid_buttons1)
+        self.layout.addItem(self.horSpacer)
+        self.layout.addItem(self.grid_buttons2)
+        
+        print(list(str(type(self.layout)).split()[1].split('.')[-1].split()[0]))
+        print(type(self.horSpacer))

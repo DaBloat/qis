@@ -1,6 +1,8 @@
 import sys
 from PyQt5.QtWidgets import *
-from interfaces import top, bot, workspace
+from interfaces.top import Top
+from interfaces.bot import Bottom
+from interfaces.workspace import *
 
 
 class Main(QWidget):
@@ -9,10 +11,10 @@ class Main(QWidget):
         self.verticalLayout = QVBoxLayout(self)
         self.verticalLayout.setObjectName("verticalLayout")
 
-        scene = workspace.WorkspaceScene()
-        work = workspace.Workspace(scene)
-        menutop = top.Top(self)
-        menubot = bot.Bottom(self, scene)
+        scene = WorkspaceScene()
+        work = Workspace(scene)
+        menutop = Top(self)
+        menubot = Bottom(self, scene)
 
         self.verticalLayout.addWidget(menutop)
         self.verticalLayout.addWidget(work)
