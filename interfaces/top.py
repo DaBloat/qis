@@ -15,7 +15,7 @@ class Top(QFrame):
         self.setStyleSheet("""QFrame#topFrame{background:rgb(234, 196, 163);}
                               """)
 
-        self.layout = QHBoxLayout(self)
+        self.layout = HorizontalOrganizer(self)
 
         self.title = TitleCard(self, 'QIS', 'Quantum Interactive Space')
 
@@ -37,16 +37,11 @@ class Top(QFrame):
         self.email = Button(self, 'Email')
 
             
-        self.grid_buttons1 = StackOrganizer(self)
-        self.grid_buttons1.stack(top=[self.button1, self.button2, self.button3, self.button4, self.button5],
+        self.stack_buttons1 = StackOrganizer(self)
+        self.stack_buttons1.stack(top=[self.button1, self.button2, self.button3, self.button4, self.button5],
                                  bottom=[self.button6, self.button7, self.button8, self.button9])
-        self.grid_buttons2 = StackOrganizer(self)
-        self.grid_buttons2.stack(top=[self.howtobutton,self.documentation], bottom=[self.github, self.email])
-        self.layout.addWidget(self.title)
-        self.layout.addItem(self.horSpacer)
-        self.layout.addItem(self.grid_buttons1)
-        self.layout.addItem(self.horSpacer)
-        self.layout.addItem(self.grid_buttons2)
+        self.stack_buttons2 = StackOrganizer(self)
+        self.stack_buttons2.stack(top=[self.howtobutton,self.documentation], bottom=[self.github, self.email])
         
-        print(list(str(type(self.layout)).split()[1].split('.')[-1].split()[0]))
-        print(type(self.horSpacer))
+        for items in [self.title, self.horSpacer, self.stack_buttons1, self.horSpacer, self.stack_buttons2]:
+            self.layout.add(items)
