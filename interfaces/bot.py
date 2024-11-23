@@ -52,4 +52,4 @@ class Bottom(QFrame):
                                     border-width: 2px;}""")
 
         self.layout.addWidget(self.output_matr)
-
+#TODO: Improve this shit, so tired cleaning but improve this shit
