@@ -29,3 +29,28 @@ class Button(QPushButton):
     def __init__(self, placeholder, text):
         super().__init__(placeholder)
         self.setText(text)
+
+class ScrollArea(QScrollArea):
+    def __init__(self, placeholder, recipient, vertOpt, horiOpt):
+        super().__init__(placeholder)
+        self.opt = {'AlwaysOn':Qt.ScrollBarAlwaysOn, 
+                    "AlwaysOff":Qt.ScrollBarAlwaysOff}
+        self.setVerticalScrollBarPolicy(self.opt[vertOpt])
+        self.setHorizontalScrollBarPolicy(self.opt[horiOpt])
+
+class HistoryBlock(QFrame):
+    def __init__(self, placeholder):
+        super().__init__(placeholder)
+        self.setObjectName('history')
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.setMinimumSize(250, 0)
+
+class OutputMatrix(QFrame):
+    def __init__(self, placeholder):
+        super().__init__(placeholder)
+        self.setObjectName('output_matrix')
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.setMinimumSize(250, 0)
+
+
+        

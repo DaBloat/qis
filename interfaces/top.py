@@ -5,8 +5,9 @@ from utils.layouts import *
 from utils.widgets import *
 
 class Top(QFrame):
-    def __init__(self, placeholder):
+    def __init__(self, placeholder, recipient):
         super().__init__(placeholder)
+        self.scene = recipient 
         self.setObjectName('topFrame')
         self.width = 0 # It automatically scales in the Screen
         self.height = 115

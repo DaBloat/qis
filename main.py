@@ -14,7 +14,7 @@ class Main(QWidget):
 
         scene = WorkspaceScene()
         work = Workspace(scene)
-        menutop = Top(self)
+        menutop = Top(self, scene)
         menubot = Bottom(self, scene)
 
         for part in [menutop, work, menubot]:
