@@ -4,6 +4,7 @@ from utils.layouts import *
 from interfaces.top import Top
 from interfaces.bot import Bottom
 from interfaces.workspace import *
+from qitems.qubit import *
 
 
 class Main(QWidget):
@@ -17,6 +18,10 @@ class Main(QWidget):
         menutop = Top(self, scene)
         menubot = Bottom(self, scene)
 
+        obj =  BlochSphere()
+        obj1 =  BlochSphere()
+        scene.addItem(obj)
+        scene.addItem(obj1)
         for part in [menutop, work, menubot]:
             self.verticalLayout.add(part)
 

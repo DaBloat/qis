@@ -1,3 +1,4 @@
+
 import sys
 from mpl_toolkits.mplot3d import Axes3D
 from qutip import *
@@ -6,6 +7,7 @@ import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from interfaces.workspace import *
+from utils.layouts import *
 
 
 class Try(QWidget):
@@ -24,11 +26,13 @@ class Try(QWidget):
 class Try2(QWidget):
     def __init__(self):
         super().__init__()
-        self.b = Bloch()
-        self.b.save('trial.png')
-        self.pix = QPixmap('trial.png')
+        self.b = Bloch(figsize=[2,2])
+        self.b.font_size = 10
+        print(self.b)
+        self.b.save('assets/trial.png')
+        self.pix = QPixmap('assets/trial.png')
         self.item = QGraphicsPixmapItem()
-        self.item.setPixmap(self.item)
+        self.item.setPixmap(self.pix)
         scene = WorkspaceScene()
         work = Workspace(scene)
         scene.addItem(self.item)
