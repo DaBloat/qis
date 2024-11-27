@@ -1,1 +1,1 @@
-__all__ = ['qubit']
+__all__ = ['bspheres']

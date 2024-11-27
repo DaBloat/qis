@@ -25,6 +25,10 @@ class VerticalOrganizer(QVBoxLayout):
     def __init__(self, placeholder):
         super().__init__(placeholder)
 
+    def stretch(self):
+        self.addStretch()
+
+
     def add(self, item):
         try:
             self.addWidget(item)
@@ -32,9 +36,13 @@ class VerticalOrganizer(QVBoxLayout):
             self.addItem(item)
 
 
+
 class HorizontalOrganizer(QHBoxLayout):
     def __init__(self, placeholder):
         super().__init__(placeholder)
+    
+    def stretch(self):
+        self.addStretch()
 
     def add(self, item):
         try:

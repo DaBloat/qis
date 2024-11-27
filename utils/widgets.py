@@ -30,6 +30,10 @@ class Button(QPushButton):
         super().__init__(placeholder)
         self.setText(text)
 
+    def setSize(self, width, height):
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setMinimumSize(width, height)
+
 class ScrollArea(QScrollArea):
     def __init__(self, placeholder, recipient, vertOpt, horiOpt):
         super().__init__(placeholder)
@@ -37,6 +41,11 @@ class ScrollArea(QScrollArea):
                     "AlwaysOff":Qt.ScrollBarAlwaysOff}
         self.setVerticalScrollBarPolicy(self.opt[vertOpt])
         self.setHorizontalScrollBarPolicy(self.opt[horiOpt])
+        self.setWidgetResizable(True)
+        self.setAlignment(Qt.AlignLeft)
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setFixedSize(500, 110)
+
 
 class HistoryBlock(QFrame):
     def __init__(self, placeholder):
