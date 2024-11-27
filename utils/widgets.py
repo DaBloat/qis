@@ -42,9 +42,9 @@ class ScrollArea(QScrollArea):
         self.setVerticalScrollBarPolicy(self.opt[vertOpt])
         self.setHorizontalScrollBarPolicy(self.opt[horiOpt])
         self.setWidgetResizable(True)
-        self.setAlignment(Qt.AlignLeft)
+        self.setAlignment(Qt.AlignCenter)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.setFixedSize(500, 110)
+        self.setFixedSize(550, 110)
 
 
 class HistoryBlock(QFrame):

@@ -3,7 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from utils.widgets import *
 from utils.layouts import *
-from qitems.bspheres import *
+from qitems.qubit_items import *
 
 
 class Bottom(QFrame):
@@ -35,19 +35,21 @@ class Bottom(QFrame):
         
         self.bloch_types = QFrame(self.rampart)
         self.scroll_bloch_items = HorizontalOrganizer(self.bloch_types)
-        self.qbutton = BlochButton(self, self.scene)
-
-        self.scroll_bloch_items.add(self.qbutton)
+        self.bloch_sph = QubitItemButton(self, self.scene, 'assets/bloch_sphere.png', 'Bloch Sphere')
+        self.scroll_bloch_items.add(self.bloch_sph)
         self.scroll_bloch_items.stretch()
 
-
-
         self.vector_types = QFrame(self.rampart)
-        self.vector_types.hide()
         self.scroll_vector_items = HorizontalOrganizer(self.vector_types)
-        self.qbutton1 = BlochButton(self, self.scene,x=50,y=50)
+        self.ket0 = QubitItemButton(self, self.scene, 'assets/ket0.png', 'Ket 0')
+        self.ket1 = QubitItemButton(self, self.scene, 'assets/ket1.png', 'Ket 1')
+        self.sigmax = QubitItemButton(self, self.scene, 'assets/sigmax.png', 'Sigma X')
+        self.sigmay = QubitItemButton(self, self.scene, 'assets/sigmay.png', 'Sigma Y')
+        self.sigmaz = QubitItemButton(self, self.scene, 'assets/sigmaz.png', 'Sigma Z')
 
-        self.scroll_vector_items.add(self.qbutton1)
+        for buttons in [self.ket0, self.ket1, self.sigmax, self.sigmay, self.sigmaz]:
+            self.scroll_vector_items.add(buttons)
+
         self.scroll_vector_items.stretch()
 
         self.scrollarea.setWidget(self.rampart)
@@ -70,10 +72,6 @@ class Bottom(QFrame):
         self.layout.add(self.history)
         self.layout.add(self.output_matr)
         self.layout.stretch()
-        
-        self.blockBloch = [self.qbutton]
-        self.blockVector = [self.qbutton1]
-
 
     def blochClicked(self):
         self.bloch_types.show()
