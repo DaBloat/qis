@@ -35,19 +35,21 @@ class Bottom(QFrame):
         
         self.bloch_types = QFrame(self.rampart)
         self.scroll_bloch_items = HorizontalOrganizer(self.bloch_types)
-        self.bloch_sph = QubitItemButton(self, self.scene, 'assets/bloch_sphere.png', 'Bloch Sphere')
+        self.bloch_sph = BlochButton(self, self.scene)
         self.scroll_bloch_items.add(self.bloch_sph)
         self.scroll_bloch_items.stretch()
 
         self.vector_types = QFrame(self.rampart)
         self.scroll_vector_items = HorizontalOrganizer(self.vector_types)
-        self.ket0 = QubitItemButton(self, self.scene, 'assets/ket0.png', 'Ket 0')
-        self.ket1 = QubitItemButton(self, self.scene, 'assets/ket1.png', 'Ket 1')
-        self.sigmax = QubitItemButton(self, self.scene, 'assets/sigmax.png', 'Sigma X')
-        self.sigmay = QubitItemButton(self, self.scene, 'assets/sigmay.png', 'Sigma Y')
-        self.sigmaz = QubitItemButton(self, self.scene, 'assets/sigmaz.png', 'Sigma Z')
+        self.ket0 = Ket0Button(self, self.scene)
+        self.ket1 = Ket1Button(self, self.scene)
+        self.sigmax = SigmaXButton(self, self.scene)
+        self.sigmay = SigmaYButton(self, self.scene)
+        self.sigmaz = SigmaZButton(self, self.scene)
+        self.addm = AddOwnMatrixButton(self, self.scene)
+        self.vector_types.hide()
 
-        for buttons in [self.ket0, self.ket1, self.sigmax, self.sigmay, self.sigmaz]:
+        for buttons in [self.ket0, self.ket1, self.sigmax, self.sigmay, self.sigmaz, self.addm]:
             self.scroll_vector_items.add(buttons)
 
         self.scroll_vector_items.stretch()
@@ -56,11 +58,6 @@ class Bottom(QFrame):
         
     
         self.history = HistoryBlock(self)
-        # self.history.setStyleSheet("""QFrame#history{background: rgb(255,255,255);
-        #                            border-style:solid;
-        #                            border-width: 2px;}""")
-
-        
 
         self.output_matr = OutputMatrix(self)
         for i in [self.bloch, self.matrix]:
