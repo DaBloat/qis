@@ -75,18 +75,20 @@ class Bloch(QubitItem):
             self.img = 'appData/bloch1.png'
             self.scene.removeItem(self.collidingItems()[0])
         else:
-            self.editPixmap(self.img)
+            pass
+            # self.editPixmap(self.img)
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
         if len(self.collidingItems()) != 0:
             print(f'Collided with {self.collidingItems()[0]}')
             if self.qnum != self.collidingItems()[0].qnum and self.collidingItems()[0].qnum == 2:
-                self.editPixmap(image='assets/check.png')
+                self.setToolTip('BRO')
             else:
-                self.editPixmap(image='assets/wrong.png')
+                self.setToolTip('Nuh Uh!')
         else:
-            self.editPixmap(self.img)
+            pass
+            # self.editPixmap(self.img)
 
 
 class BlochButton(QubitItemButton):
@@ -101,8 +103,9 @@ class BlochButton(QubitItemButton):
         self.scene.addItem(self.b)
 
 class Ket0(QubitItem):
-    def __init__(self, img='assets/ket0.png'):
+    def __init__(self, scene, img='assets/ket0.png'):
         super().__init__(img)
+        self.scene = scene
         self.name = "Ket0"
         self.qnum = 2
         self.matrix = np.array([[1],[0]])
@@ -110,21 +113,34 @@ class Ket0(QubitItem):
     def mouseMoveEvent(self, event):
         self.mousePos(event)
 
+    def mouseReleaseEvent(self, event):
+        if len(self.collidingItems()) == 1 and self.qnum != self.collidingItems()[0].qnum and self.collidingItems()[0].qnum == 1:
+            print(self.collidingItems()[0].name)
+            self.collidingItems()[0].bloch.add_states(qp.Qobj(self.matrix))
+            self.collidingItems()[0].bloch.save('appData/bloch1.png')
+            self.collidingItems()[0].editPixmap(image='appData/bloch1.png')
+            self.collidingItems()[0].img = 'appData/bloch1.png'
+            self.scene.removeItem(self)
+        else:
+            pass
+
 
 class Ket0Button(QubitItemButton):
     def __init__(self, placeholder, scene, img='assets/ket0.png', name='Ket 0'):
         super().__init__(placeholder, scene, img, name)
         self.clicked.connect(self.addKet0ToTheScene)
+        self.scene = scene
 
     def addKet0ToTheScene(self):
         print("Added for Ket0")
-        self.ket0 = Ket0(self.img)
+        self.ket0 = Ket0(self.scene, self.img)
         self.scene.addItem(self.ket0)
 
 
 class Ket1(QubitItem):
-    def __init__(self, img='assets/ket1.png'):
+    def __init__(self, scene, img='assets/ket1.png'):
         super().__init__(img)
+        self.scene = scene
         self.name = "Ket1"
         self.qnum = 2
         self.matrix = np.array([[0],[1]])
@@ -132,15 +148,26 @@ class Ket1(QubitItem):
     def mouseMoveEvent(self, event):
         self.mousePos(event)
 
+    def mouseReleaseEvent(self, event):
+        if len(self.collidingItems()) == 1 and self.qnum != self.collidingItems()[0].qnum and self.collidingItems()[0].qnum == 1:
+            print(self.collidingItems()[0].name)
+            self.collidingItems()[0].bloch.add_states(qp.Qobj(self.matrix))
+            self.collidingItems()[0].bloch.save('appData/bloch1.png')
+            self.collidingItems()[0].editPixmap(image='appData/bloch1.png')
+            self.collidingItems()[0].img = 'appData/bloch1.png'
+            self.scene.removeItem(self)
+        else:
+            pass
 
 class Ket1Button(QubitItemButton):
     def __init__(self, placeholder, scene, img='assets/ket1.png', name='Ket 1'):
         super().__init__(placeholder, scene, img, name)
+        self.scene = scene
         self.clicked.connect(self.addKet1ToTheScene)
 
     def addKet1ToTheScene(self):
         print("Added for Ket1")
-        self.ket1 = Ket1(self.img)
+        self.ket1 = Ket1(self.scene, self.img)
         self.scene.addItem(self.ket1)
 
 
