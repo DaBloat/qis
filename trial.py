@@ -26,8 +26,8 @@ class Try(QWidget):
 class Try2(QWidget):
     def __init__(self):
         super().__init__()
-        self.b = Bloch(figsize=[2,2])
-        self.b.font_size = 10
+        self.b = Bloch(figsize=[4,4])
+        self.b.font_size = 12
         print(self.b)
         self.b.save('assets/trial.png')
         self.pix = QPixmap('assets/trial.png')

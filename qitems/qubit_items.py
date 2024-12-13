@@ -42,7 +42,7 @@ class QubitItem(QGraphicsPixmapItem):
         self.setPos(QPointF(updated_cursorX, updated_cursorY))
 
 class QubitItemButton(QToolButton):
-    def __init__(self, placeholder, scene, img, name, x=100,y=75):
+    def __init__(self, placeholder, scene, img, name, x=70,y=60):
         super().__init__(placeholder)
         self.scene = scene
         self.img = img
@@ -51,7 +51,7 @@ class QubitItemButton(QToolButton):
         self.setFixedSize(x, y)
         self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.icon = QIcon(self.img)
-        self.setIconSize(QSize(50,50))
+        self.setIconSize(QSize(40,40))
         self.setIcon(self.icon)
         self.setText(self.name)
 
@@ -62,7 +62,7 @@ class Bloch(QubitItem):
         self.scene = scene
         self.name = 'BlochSphere'
         self.qnum = 1
-        self.bloch = qp.Bloch(figsize=[2,2])
+        self.bloch = qp.Bloch(figsize=[4,4])
         self.bloch.font_size = 10
 
     def mouseReleaseEvent(self, event):
@@ -177,6 +177,8 @@ class SigmaX(QubitItem):
         self.name = 'SigmaX'
         self.qnum = 3
 
+    def mouseMoveEvent(self, event):
+        self.mousePos(event)
 
 class SigmaXButton(QubitItemButton):
     def __init__(self, placeholder, scene, img='assets/sigmax.png', name='Sigma X'):
@@ -194,6 +196,9 @@ class SigmaY(QubitItem):
         super().__init__(img)
         self.name = 'SigmaY'
         self.qnum = 3
+
+    def mouseMoveEvent(self, event):
+        self.mousePos(event)
 
 
 
@@ -213,6 +218,8 @@ class SigmaZ(QubitItem):
         self.name = 'SigmaZ'
         self.qnum = 3
 
+    def mouseMoveEvent(self, event):
+        self.mousePos(event)
 
 
 class SigmaZButton(QubitItemButton):
@@ -226,18 +233,40 @@ class SigmaZButton(QubitItemButton):
         self.scene.addItem(self.sigmaz)
 
 
-class AddMatrix(QubitItem):
+class UnitaryGate(QubitItem):
     def __init__(self, img='assets/addMatrix.png'):
         super().__init__(img)
-        self.name = 'AddedMatrix'
+        self.name = 'Unitary Gate'
         self.qnum = 3
 
-class AddOwnMatrixButton(QubitItemButton):
-    def __init__(self, placeholder, scene, img='assets/addMatrix.png', name='Add Own Matrix'):
-        super().__init__(placeholder, scene, img, name)
-        self.clicked.connect(self.addMatrixToTheScene)
+    def mouseMoveEvent(self, event):
+        self.mousePos(event)
 
-    def addMatrixToTheScene(self):
-        print("Added for Own Matrix")
-        self.oMatrix = AddMatrix(self.img)
-        self.scene.addItem(self.oMatrix)
+class UnitaryButton(QubitItemButton):
+    def __init__(self, placeholder, scene, img='assets/unitary.png', name='Unitary'):
+        super().__init__(placeholder, scene, img, name)
+        self.clicked.connect(self.addUnitaryToTheScene)
+
+    def addUnitaryToTheScene(self):
+        print("Added Unitary Gate")
+        self.unitary = UnitaryGate(self.img)
+        self.scene.addItem(self.unitary)
+
+class HadamardGate(QubitItem):
+    def __init__(self, img='assets/hadamard.png'):
+        super().__init__(img)
+        self.name = 'Hadamard Gate'
+        self.qnum = 3
+
+    def mouseMoveEvent(self, event):
+        self.mousePos(event)
+
+class HadamardButton(QubitItemButton):
+    def __init__(self, placeholder, scene, img='assets/hadamard.png', name='Hadamard'):
+        super().__init__(placeholder, scene, img, name)
+        self.clicked.connect(self.addHadamardToTheScene)
+
+    def addHadamardToTheScene(self):
+        print("Added Hadamard Gate")
+        self.unitary = HadamardGate(self.img)
+        self.scene.addItem(self.unitary)

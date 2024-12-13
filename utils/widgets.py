@@ -10,7 +10,8 @@ class TitleCard(QFrame):
         self.setMinimumSize(150,0)
         self.setStyleSheet("""QFrame#titleCard{background: rgb(255,255,255);
                                     border-style:solid;
-                                    border-width: 2px;}""")
+                                    border-width: 2px;
+                                    border-radius: 15px;}""")
 
         self.title_layout = QVBoxLayout(self)
         self.title = QLabel(title)
@@ -35,7 +36,7 @@ class Button(QPushButton):
         self.setMinimumSize(width, height)
 
 class ScrollArea(QScrollArea):
-    def __init__(self, placeholder, recipient, vertOpt, horiOpt):
+    def __init__(self, placeholder, vertOpt, horiOpt):
         super().__init__(placeholder)
         self.opt = {'AlwaysOn':Qt.ScrollBarAlwaysOn, 
                     "AlwaysOff":Qt.ScrollBarAlwaysOff}
@@ -43,23 +44,7 @@ class ScrollArea(QScrollArea):
         self.setHorizontalScrollBarPolicy(self.opt[horiOpt])
         self.setWidgetResizable(True)
         self.setAlignment(Qt.AlignCenter)
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.setFixedSize(650, 110)
-
-
-class HistoryBlock(QFrame):
-    def __init__(self, placeholder):
-        super().__init__(placeholder)
-        self.setObjectName('history')
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        self.setMinimumSize(250, 0)
-
-class OutputMatrix(QFrame):
-    def __init__(self, placeholder):
-        super().__init__(placeholder)
-        self.setObjectName('output_matrix')
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        self.setMinimumSize(250, 0)
-
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # self.setFixedSize(100, 10)
 
         
