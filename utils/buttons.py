@@ -64,6 +64,7 @@ class RefreshBlochButton(QToolButton):
 
     def refreshBloch(self):
         self.b.bloch.clear()
+        self.b.output_stack = []
         self.b.bloch.save('appData/bloch1.png')
         self.b.editPixmap(image='appData/bloch1.png')
         self.b.img = 'appData/bloch1.png'
@@ -82,6 +83,7 @@ class DeleteBlochButton(QToolButton):
 
     def deleteBloch(self):
         self.b.bloch.clear()
+        self.b.output_stack = []
         self.b.bloch.save('appData/bloch1.png')
         self.b.editPixmap(image='appData/bloch1.png')
         self.b.img = 'appData/bloch1.png'
@@ -95,7 +97,7 @@ class Ket0Button(QubitItemButton):
 
     def addKet0ToTheScene(self):
         print("Added for Ket0")
-        self.ket0 = Ket0(self.scene, self.img)
+        self.ket0 = Ket0(self.img)
         self.scene.addItem(self.ket0)
 
 class Ket1Button(QubitItemButton):
@@ -106,12 +108,13 @@ class Ket1Button(QubitItemButton):
 
     def addKet1ToTheScene(self):
         print("Added for Ket1")
-        self.ket1 = Ket1(self.scene, self.img)
+        self.ket1 = Ket1(self.img)
         self.scene.addItem(self.ket1)
 
 class SigmaXButton(QubitItemButton):
     def __init__(self, placeholder, scene, img='assets/sigmax.png', name='Sigma X'):
         super().__init__(placeholder, scene, img, name)
+        self.scene = scene 
         self.clicked.connect(self.addSigmaxToTheScene)
 
     def addSigmaxToTheScene(self):

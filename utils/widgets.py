@@ -43,8 +43,8 @@ class ScrollArea(QScrollArea):
 class BlochSphereControl(QFrame):
     def __init__(self, placeholder, scene):
         super().__init__(placeholder)
-        self.sphere = Bloch()
-        self.scene = scene
+        self.scene = scene        
+        self.sphere = Bloch(self.scene)
         self.setObjectName('BlochSphereControl')
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
         self.setMinimumSize(50,0)

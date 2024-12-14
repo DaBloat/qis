@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import qutip as qp
+from qutip_qip.operations import *
 import numpy as np
 
 class QubitItem(QGraphicsPixmapItem):
@@ -11,12 +12,13 @@ class QubitItem(QGraphicsPixmapItem):
         self.editPixmap(self.img)
         self.setAcceptHoverEvents(True)
         self.setFlag(QGraphicsPixmapItem.ItemIsSelectable)
+        self.pen = QPen(QColor("black"))
+        self.pen.setWidth(2)
+
  
     def paint(self, painter, option, widget=None):
         super().paint(painter, option, widget)
-        pen = QPen(QColor("black"))
-        pen.setWidth(2)
-        painter.setPen(pen)
+        painter.setPen(self.pen)
         painter.setRenderHints(painter.Antialiasing)
         path = QPainterPath()
         painter.drawEllipse(self.boundingRect())
@@ -40,7 +42,11 @@ class QubitItem(QGraphicsPixmapItem):
         self.setPixmap(target)
 
     def mousePressEvent(self, event):
-        pass
+        self.pen = QPen(QColor("red"))
+
+    def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
+
 
     def mousePos(self, event):
         orig_position = event.lastScenePos()
@@ -57,13 +63,40 @@ class QubitItem(QGraphicsPixmapItem):
                 self.setZValue(1)
 
 class Bloch(QGraphicsPixmapItem):
-    def __init__(self, img='assets/bloch_sphere.png'):
+    def __init__(self,scene, img='assets/bloch_sphere.png'):
         super().__init__()
+        self.scene = scene
         self.name = 'BlochSphere'
         self.qnum = 1
         self.editPixmap(img)
         self.bloch = qp.Bloch(figsize=[4,4])
         self.bloch.font_size = 12
+        self.states_stack = []
+        self.output_stack = []
+
+    def bloch_plot(self, qitem):
+        try:
+            if (len(self.output_stack) == 0 and qitem.qnum == 2) or qitem.qnum == 2:
+                self.output_stack = []
+                self.states_stack = []
+                self.output_stack.append(qp.Qobj(qitem.matrix))
+                self.states_stack.append(qitem.name)
+                self.scene.removeItem(qitem)
+            elif len(self.output_stack) != 0:
+                current = qitem.matrix @ qp.Qobj(self.output_stack[-1])
+                self.output_stack.append(current)
+                self.states_stack.append(qitem.name)
+                self.scene.removeItem(qitem)
+            self.bloch.clear()
+            self.bloch.add_states(qp.Qobj(self.output_stack[-1]))
+            self.bloch.save('appData/bloch1.png')
+            self.editPixmap(image='appData/bloch1.png')
+            self.img = 'appData/bloch1.png'
+            print(self.states_stack)
+            print(len(self.output_stack))
+        except:
+            print("BRUH")
+
 
     def editPixmap(self, image):
         self.pix = QPixmap(image)
@@ -94,7 +127,6 @@ class Bloch(QGraphicsPixmapItem):
         updated_cursorY = updated_position.y() - orig_position.y() + original.y()
         self.setPos(QPointF(updated_cursorX, updated_cursorY))
 
-
     def mouseReleaseEvent(self, event):
         pass
 
@@ -103,9 +135,8 @@ class Bloch(QGraphicsPixmapItem):
 
 
 class Ket0(QubitItem):
-    def __init__(self, scene, img='assets/ket0.png'):
+    def __init__(self, img='assets/ket0.png'):
         super().__init__(img)
-        self.scene = scene
         self.name = "Ket0"
         self.qnum = 2
         self.matrix = np.array([[1],[0]])
@@ -114,6 +145,7 @@ class Ket0(QubitItem):
         self.mousePos(event)
 
     def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
         if len(self.collidingItems()) == 1 and self.qnum != self.collidingItems()[0].qnum and self.collidingItems()[0].qnum == 1:
             print(self.collidingItems()[0].name)
             self.collidingItems()[0].bloch.clear()
@@ -121,15 +153,14 @@ class Ket0(QubitItem):
             self.collidingItems()[0].bloch.save('appData/bloch1.png')
             self.collidingItems()[0].editPixmap(image='appData/bloch1.png')
             self.collidingItems()[0].img = 'appData/bloch1.png'
-            self.scene.removeItem(self)
+            self.collidingItems()[0].bloch_plot(self)
         else:
             pass
 
 
 class Ket1(QubitItem):
-    def __init__(self, scene, img='assets/ket1.png'):
+    def __init__(self, img='assets/ket1.png'):
         super().__init__(img)
-        self.scene = scene
         self.name = "Ket1"
         self.qnum = 2
         self.matrix = np.array([[0],[1]])
@@ -138,6 +169,7 @@ class Ket1(QubitItem):
         self.mousePos(event)
 
     def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
         if len(self.collidingItems()) == 1 and self.qnum != self.collidingItems()[0].qnum and self.collidingItems()[0].qnum == 1:
             print(self.collidingItems()[0].name)
             self.collidingItems()[0].bloch.clear()
@@ -145,7 +177,7 @@ class Ket1(QubitItem):
             self.collidingItems()[0].bloch.save('appData/bloch1.png')
             self.collidingItems()[0].editPixmap(image='appData/bloch1.png')
             self.collidingItems()[0].img = 'appData/bloch1.png'
-            self.scene.removeItem(self)
+            self.collidingItems()[0].bloch_plot(self)
         else:
             pass
 
@@ -155,9 +187,15 @@ class SigmaX(QubitItem):
         super().__init__(img)
         self.name = 'SigmaX'
         self.qnum = 3
+        self.matrix = X(0).get_compact_qobj()
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
+
+    def mouseReleaseEvent(self, event):        
+        self.pen = QPen(QColor("black"))
+        if len(self.collidingItems()) == 1 and self.collidingItems()[0].qnum == 1:
+            self.collidingItems()[0].bloch_plot(self)
 
 
 class SigmaY(QubitItem):
@@ -165,9 +203,15 @@ class SigmaY(QubitItem):
         super().__init__(img)
         self.name = 'SigmaY'
         self.qnum = 3
+        self.matrix = Y(0).get_compact_qobj()
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
+
+    def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
+        if len(self.collidingItems()) == 1 and self.collidingItems()[0].qnum == 1:
+            self.collidingItems()[0].bloch_plot(self)
 
 
 class SigmaZ(QubitItem):
@@ -175,9 +219,15 @@ class SigmaZ(QubitItem):
         super().__init__(img)
         self.name = 'SigmaZ'
         self.qnum = 3
+        self.matrix = Z(0).get_compact_qobj()
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
+
+    def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
+        if len(self.collidingItems()) == 1 and self.collidingItems()[0].qnum == 1:
+            self.collidingItems()[0].bloch_plot(self)
 
 
 class UnitaryGate(QubitItem):
@@ -189,24 +239,41 @@ class UnitaryGate(QubitItem):
     def mouseMoveEvent(self, event):
         self.mousePos(event)
 
+    def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
+        if len(self.collidingItems()) == 1 and self.collidingItems()[0].qnum == 1:
+            self.collidingItems()[0].bloch_plot(self)
+
 
 class HadamardGate(QubitItem):
     def __init__(self, img='assets/hadamard.png'):
         super().__init__(img)
         self.name = 'Hadamard Gate'
         self.qnum = 3
+        self.matrix = H(0).get_compact_qobj()
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
+
+    def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
+        if len(self.collidingItems()) == 1 and self.collidingItems()[0].qnum == 1:
+            self.collidingItems()[0].bloch_plot(self)
 
 class SPhase(QubitItem):
     def __init__(self, img='assets/SPhase.png'):
         super().__init__(img)
         self.name = 'S Phase'
         self.qnum = 3
+        self.matrix = S(0).get_compact_qobj()
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
+
+    def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
+        if len(self.collidingItems()) == 1 and self.collidingItems()[0].qnum == 1:
+            self.collidingItems()[0].bloch_plot(self)
 
 
 class TPhase(QubitItem):
@@ -214,18 +281,30 @@ class TPhase(QubitItem):
         super().__init__(img)
         self.name = 'T Phase'
         self.qnum = 3
+        self.matrix = T(0).get_compact_qobj()
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
+
+    def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
+        if len(self.collidingItems()) == 1 and self.collidingItems()[0].qnum == 1:
+            self.collidingItems()[0].bloch_plot(self)
 
 class RotationX(QubitItem):
     def __init__(self, img='assets/rotationX.png'):
         super().__init__(img)
         self.name = 'X Rotation'
         self.qnum = 3
+        self.matrix = RX(0, np.pi/2).get_compact_qobj()
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
+
+    def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
+        if len(self.collidingItems()) == 1 and self.collidingItems()[0].qnum == 1:
+            self.collidingItems()[0].bloch_plot(self)
 
 
 class RotationY(QubitItem):
@@ -233,9 +312,16 @@ class RotationY(QubitItem):
         super().__init__(img)
         self.name = 'Y Rotation'
         self.qnum = 3
+        self.matrix = RY(0, np.pi/2).get_compact_qobj()
+
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
+
+    def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
+        if len(self.collidingItems()) == 1 and self.collidingItems()[0].qnum == 1:
+            self.collidingItems()[0].bloch_plot(self)
 
 
 class RotationZ(QubitItem):
@@ -243,6 +329,13 @@ class RotationZ(QubitItem):
         super().__init__(img)
         self.name = 'Z Rotation'
         self.qnum = 3
+        self.matrix = RZ(0, np.pi/2).get_compact_qobj()
+
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
+
+    def mouseReleaseEvent(self, event):
+        self.pen = QPen(QColor("black"))
+        if len(self.collidingItems()) == 1 and self.collidingItems()[0].qnum == 1:
+            self.collidingItems()[0].bloch_plot(self)
