@@ -3,6 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from utils.layouts import *
 from utils.widgets import *
+from utils.buttons import *
 
 class Top(QFrame):
     def __init__(self, placeholder, recipient):

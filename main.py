@@ -20,7 +20,6 @@ class Main(QWidget):
         for part in [menutop, work, menubot]:
             self.verticalLayout.add(part)
 
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     main = Main()

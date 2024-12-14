@@ -9,11 +9,21 @@ class QubitItem(QGraphicsPixmapItem):
         super().__init__()
         self.img = img
         self.editPixmap(self.img)
-
+        self.setAcceptHoverEvents(True)
+        self.setFlag(QGraphicsPixmapItem.ItemIsSelectable)
+ 
+    def paint(self, painter, option, widget=None):
+        super().paint(painter, option, widget)
+        pen = QPen(QColor("black"))
+        pen.setWidth(2)
+        painter.setPen(pen)
+        painter.setRenderHints(painter.Antialiasing)
+        path = QPainterPath()
+        painter.drawEllipse(self.boundingRect())
+        
     def editPixmap(self, image):
         self.pix = QPixmap(image)
         size = min(self.pix.width(), self.pix.height())
-
         target = QPixmap(size, size)
         target.fill(Qt.transparent)
 
@@ -28,7 +38,50 @@ class QubitItem(QGraphicsPixmapItem):
         qp.drawPixmap(target.rect(), self.pix, sourceRect)
         qp.end()
         self.setPixmap(target)
-        self.setAcceptHoverEvents(True)
+
+    def mousePressEvent(self, event):
+        pass
+
+    def mousePos(self, event):
+        orig_position = event.lastScenePos()
+        updated_position = event.scenePos()
+        original = self.scenePos()
+        updated_cursorX = updated_position.x() - orig_position.x() + original.x()
+        updated_cursorY = updated_position.y() - orig_position.y() + original.y()
+        self.setPos(QPointF(updated_cursorX, updated_cursorY))
+        
+        # Selected is always at the top 
+        if self.collidingItems() != 0:
+            for i in self.collidingItems():
+                i.setZValue(-1)
+                self.setZValue(1)
+
+class Bloch(QGraphicsPixmapItem):
+    def __init__(self, img='assets/bloch_sphere.png'):
+        super().__init__()
+        self.name = 'BlochSphere'
+        self.qnum = 1
+        self.editPixmap(img)
+        self.bloch = qp.Bloch(figsize=[4,4])
+        self.bloch.font_size = 12
+
+    def editPixmap(self, image):
+        self.pix = QPixmap(image)
+        size = min(self.pix.width(), self.pix.height())
+        target = QPixmap(size, size)
+        target.fill(Qt.transparent)
+
+        qp = QPainter(target)
+        qp.setRenderHints(qp.Antialiasing)
+        path = QPainterPath()
+        path.addEllipse(0, 0, size, size)
+        qp.setClipPath(path)
+
+        sourceRect = QRect(0, 0, size, size)
+        sourceRect.moveCenter(self.pix.rect().center())
+        qp.drawPixmap(target.rect(), self.pix, sourceRect)
+        qp.end()
+        self.setPixmap(target)
 
     def mousePressEvent(self, event):
         pass
@@ -41,66 +94,13 @@ class QubitItem(QGraphicsPixmapItem):
         updated_cursorY = updated_position.y() - orig_position.y() + original.y()
         self.setPos(QPointF(updated_cursorX, updated_cursorY))
 
-class QubitItemButton(QToolButton):
-    def __init__(self, placeholder, scene, img, name, x=70,y=60):
-        super().__init__(placeholder)
-        self.scene = scene
-        self.img = img
-        self.name = name
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.setFixedSize(x, y)
-        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.icon = QIcon(self.img)
-        self.setIconSize(QSize(40,40))
-        self.setIcon(self.icon)
-        self.setText(self.name)
-
-
-class Bloch(QubitItem):
-    def __init__(self, scene, img='assets/bloch_sphere.png'):
-        super().__init__(img)
-        self.scene = scene
-        self.name = 'BlochSphere'
-        self.qnum = 1
-        self.bloch = qp.Bloch(figsize=[4,4])
-        self.bloch.font_size = 10
 
     def mouseReleaseEvent(self, event):
-        if len(self.collidingItems()) == 1 and self.qnum != self.collidingItems()[0].qnum and self.collidingItems()[0].qnum == 2:
-            print(self.collidingItems()[0].name)
-            self.qOb = qp.Qobj(self.collidingItems()[0].matrix)
-            self.bloch.add_states(self.qOb)
-            self.bloch.save('appData/bloch1.png')
-            self.editPixmap(image='appData/bloch1.png')
-            self.img = 'appData/bloch1.png'
-            self.scene.removeItem(self.collidingItems()[0])
-        else:
-            pass
-            # self.editPixmap(self.img)
+        pass
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
-        if len(self.collidingItems()) != 0:
-            print(f'Collided with {self.collidingItems()[0]}')
-            if self.qnum != self.collidingItems()[0].qnum and self.collidingItems()[0].qnum == 2:
-                self.setToolTip('BRO')
-            else:
-                self.setToolTip('Nuh Uh!')
-        else:
-            pass
-            # self.editPixmap(self.img)
 
-
-class BlochButton(QubitItemButton):
-    def __init__(self, placeholder, scene, img='assets/bloch_sphere.png', name='Bloch Sphere'):
-        super().__init__(placeholder, scene, img, name)
-        self.scene = scene
-        self.clicked.connect(self.addBlochToTheScene)
-
-    def addBlochToTheScene(self):
-        print("Added for Bloch")
-        self.b = Bloch(self.scene, self.img)
-        self.scene.addItem(self.b)
 
 class Ket0(QubitItem):
     def __init__(self, scene, img='assets/ket0.png'):
@@ -116,6 +116,7 @@ class Ket0(QubitItem):
     def mouseReleaseEvent(self, event):
         if len(self.collidingItems()) == 1 and self.qnum != self.collidingItems()[0].qnum and self.collidingItems()[0].qnum == 1:
             print(self.collidingItems()[0].name)
+            self.collidingItems()[0].bloch.clear()
             self.collidingItems()[0].bloch.add_states(qp.Qobj(self.matrix))
             self.collidingItems()[0].bloch.save('appData/bloch1.png')
             self.collidingItems()[0].editPixmap(image='appData/bloch1.png')
@@ -123,18 +124,6 @@ class Ket0(QubitItem):
             self.scene.removeItem(self)
         else:
             pass
-
-
-class Ket0Button(QubitItemButton):
-    def __init__(self, placeholder, scene, img='assets/ket0.png', name='Ket 0'):
-        super().__init__(placeholder, scene, img, name)
-        self.clicked.connect(self.addKet0ToTheScene)
-        self.scene = scene
-
-    def addKet0ToTheScene(self):
-        print("Added for Ket0")
-        self.ket0 = Ket0(self.scene, self.img)
-        self.scene.addItem(self.ket0)
 
 
 class Ket1(QubitItem):
@@ -151,6 +140,7 @@ class Ket1(QubitItem):
     def mouseReleaseEvent(self, event):
         if len(self.collidingItems()) == 1 and self.qnum != self.collidingItems()[0].qnum and self.collidingItems()[0].qnum == 1:
             print(self.collidingItems()[0].name)
+            self.collidingItems()[0].bloch.clear()
             self.collidingItems()[0].bloch.add_states(qp.Qobj(self.matrix))
             self.collidingItems()[0].bloch.save('appData/bloch1.png')
             self.collidingItems()[0].editPixmap(image='appData/bloch1.png')
@@ -158,17 +148,6 @@ class Ket1(QubitItem):
             self.scene.removeItem(self)
         else:
             pass
-
-class Ket1Button(QubitItemButton):
-    def __init__(self, placeholder, scene, img='assets/ket1.png', name='Ket 1'):
-        super().__init__(placeholder, scene, img, name)
-        self.scene = scene
-        self.clicked.connect(self.addKet1ToTheScene)
-
-    def addKet1ToTheScene(self):
-        print("Added for Ket1")
-        self.ket1 = Ket1(self.scene, self.img)
-        self.scene.addItem(self.ket1)
 
 
 class SigmaX(QubitItem):
@@ -179,16 +158,6 @@ class SigmaX(QubitItem):
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
-
-class SigmaXButton(QubitItemButton):
-    def __init__(self, placeholder, scene, img='assets/sigmax.png', name='Sigma X'):
-        super().__init__(placeholder, scene, img, name)
-        self.clicked.connect(self.addSigmaxToTheScene)
-
-    def addSigmaxToTheScene(self):
-        print("Added for Sigma X")
-        self.sigmax = SigmaX(self.img)
-        self.scene.addItem(self.sigmax)
 
 
 class SigmaY(QubitItem):
@@ -201,17 +170,6 @@ class SigmaY(QubitItem):
         self.mousePos(event)
 
 
-
-class SigmaYButton(QubitItemButton):
-    def __init__(self, placeholder, scene, img='assets/sigmay.png', name='Sigma Y'):
-        super().__init__(placeholder, scene, img, name)
-        self.clicked.connect(self.addSigmayToTheScene)
-
-    def addSigmayToTheScene(self):
-        print("Added for Sigma Y")
-        self.sigmay = SigmaY(self.img)
-        self.scene.addItem(self.sigmay)
-
 class SigmaZ(QubitItem):
     def __init__(self, img='assets/sigmaz.png'):
         super().__init__(img)
@@ -220,17 +178,6 @@ class SigmaZ(QubitItem):
 
     def mouseMoveEvent(self, event):
         self.mousePos(event)
-
-
-class SigmaZButton(QubitItemButton):
-    def __init__(self, placeholder, scene, img='assets/sigmaz.png', name='Sigma Z'):
-        super().__init__(placeholder, scene, img, name)
-        self.clicked.connect(self.addSigmazToTheScene)
-
-    def addSigmazToTheScene(self):
-        print("Added for Sigma Z")
-        self.sigmaz = SigmaZ(self.img)
-        self.scene.addItem(self.sigmaz)
 
 
 class UnitaryGate(QubitItem):
@@ -242,15 +189,6 @@ class UnitaryGate(QubitItem):
     def mouseMoveEvent(self, event):
         self.mousePos(event)
 
-class UnitaryButton(QubitItemButton):
-    def __init__(self, placeholder, scene, img='assets/unitary.png', name='Unitary'):
-        super().__init__(placeholder, scene, img, name)
-        self.clicked.connect(self.addUnitaryToTheScene)
-
-    def addUnitaryToTheScene(self):
-        print("Added Unitary Gate")
-        self.unitary = UnitaryGate(self.img)
-        self.scene.addItem(self.unitary)
 
 class HadamardGate(QubitItem):
     def __init__(self, img='assets/hadamard.png'):
@@ -261,12 +199,50 @@ class HadamardGate(QubitItem):
     def mouseMoveEvent(self, event):
         self.mousePos(event)
 
-class HadamardButton(QubitItemButton):
-    def __init__(self, placeholder, scene, img='assets/hadamard.png', name='Hadamard'):
-        super().__init__(placeholder, scene, img, name)
-        self.clicked.connect(self.addHadamardToTheScene)
+class SPhase(QubitItem):
+    def __init__(self, img='assets/SPhase.png'):
+        super().__init__(img)
+        self.name = 'S Phase'
+        self.qnum = 3
 
-    def addHadamardToTheScene(self):
-        print("Added Hadamard Gate")
-        self.unitary = HadamardGate(self.img)
-        self.scene.addItem(self.unitary)
+    def mouseMoveEvent(self, event):
+        self.mousePos(event)
+
+
+class TPhase(QubitItem):
+    def __init__(self, img='assets/TPhase.png'):
+        super().__init__(img)
+        self.name = 'T Phase'
+        self.qnum = 3
+
+    def mouseMoveEvent(self, event):
+        self.mousePos(event)
+
+class RotationX(QubitItem):
+    def __init__(self, img='assets/rotationX.png'):
+        super().__init__(img)
+        self.name = 'X Rotation'
+        self.qnum = 3
+
+    def mouseMoveEvent(self, event):
+        self.mousePos(event)
+
+
+class RotationY(QubitItem):
+    def __init__(self, img='assets/rotationY.png'):
+        super().__init__(img)
+        self.name = 'Y Rotation'
+        self.qnum = 3
+
+    def mouseMoveEvent(self, event):
+        self.mousePos(event)
+
+
+class RotationZ(QubitItem):
+    def __init__(self, img='assets/rotationYZpng'):
+        super().__init__(img)
+        self.name = 'Z Rotation'
+        self.qnum = 3
+
+    def mouseMoveEvent(self, event):
+        self.mousePos(event)
